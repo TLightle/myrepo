@@ -1,0 +1,21 @@
+"Field_Name","Meaning","Type","Units","Codes_Values","Missing_Values","Valid_Values","Notes_Relationships","Notes_Relationship"
+"Sighting_ID","","character","","","","","",NA
+"Observer_ID","","character","","","","","",NA
+"Date","","Date","","","","","",NA
+"Time","","hms, difftime","","","","","",NA
+"Site_Code","","character","","","","","",NA
+"Latitude","","numeric","","","","","",NA
+"Longitude","","numeric","","","","","",NA
+"Species_Common","","character","","","","","",NA
+"Species_Code","","character","","","","","",NA
+"Status","","character","","","","","",NA
+"Band_Color","","character","","","","","",NA
+"Tag_Flag","","numeric","","","","","",NA
+"Bird_ID","","character","","","","","",NA
+"Distance_m","","numeric","","","","","",NA
+"Age_Class","","character","","","","","",NA
+"Age_Code","","numeric","","","","","",NA
+"Sex","","character","","","","","",NA
+"Sex_Code","Sex of the bird when it could be determined visually.","numeric","N/A","1 = female, 2 = male","NA means sex could not be determined","1, 2, or NA","","Matches sex (f/m); more NA for wild hatch hatch-year birds."
+"Release_Year","","numeric","","","","","",NA
+"Release_Cohort","","character","","","","","",NA

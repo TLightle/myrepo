@@ -1,5 +1,5 @@
 ---
-title: "Chapter 9 Practice"
+title: "Chapter 9 Practice: Data Dictionary"
 author: "Tammy Lightle"
 date: "`r Sys.Date()`"
 output: html_notebook
@@ -8,5 +8,77 @@ output: html_notebook
 ## Load Data
 ```{r}
 library(readr)
-dplace_df <- read_csv("data/Values_Transport_dplace.csv")
+field_sightings <- read_csv("field_sightings_expanded.csv")
+
+# inspect
+head(field_sightings)
+str(field_sightings)
 ```
+
+# Create table for data dictionary
+```{r}
+# Create a new data frame for the data dictionary
+data_dictionary <- data.frame(    
+  
+# Get the column names from the dataset, store in column 1 named "Field_Name"
+  Field_Name = names(field_sightings),  
+  
+# Initialize the "Meaning" column with empty strings
+  Meaning = rep("", ncol(field_sightings)),  
+
+# Get the data class type of each column using class() and store in column 3 named "Type"
+  Type = vapply(field_sightings, function(x) 
+    paste(class(x), collapse = ", "), character(1)),    
+ 
+# Initialize the "Units" column with empty strings 
+  Units = rep("", ncol(field_sightings)),              
+
+# Initialize the "Codes_Values" column with empty strings
+  Codes_Values = rep("", ncol(field_sightings)), 
+
+# Initialize the "Missing_Values" column with empty strings 
+  Missing_Values = rep("", ncol(field_sightings)), 
+
+# Initialize the "Valid_Values" column with empty strings
+  Valid_Values = rep("", ncol(field_sightings)),    
+
+# Initialize the "Notes_Relationships" column with empty strings
+  Notes_Relationships = rep("", ncol(field_sightings)),
+
+# Do not convert strings to factors (keep them as character vectors)
+  stringsAsFactors = FALSE
+)
+
+# check
+head(data_dictionary)
+```
+
+## Explore data
+```{r}
+table(field_sightings$Sex_Code, useNA = "ifany")
+```
+1,985 female (code = 1) and 1,801 male (code = 2), and 684 undetermined (left blank).
+
+## Subassignment
+```{r}
+row <- which(data_dictionary$Field_Name == "Sex_Code")
+row
+```
+```{r}
+data_dictionary[row, "Meaning"] <- "Sex of the bird when it could be determined visually."
+data_dictionary[row, "Units"] <- "N/A"
+data_dictionary[row, "Codes_Values"] <- "1 = female, 2 = male"
+data_dictionary[row, "Missing_Values"] <- "NA means sex could not be determined"
+data_dictionary[row, "Valid_Values"] <- "1, 2, or NA"
+data_dictionary[row, "Notes_Relationship"] <- "Matches sex (f/m); more NA for wild hatch hatch-year birds."
+
+tail(data_dictionary)
+```
+
+## Save file
+```{r}
+write.csv(data_dictionary, "field_sightings_dictionary.csv", row.names = FALSE)
+```
+
+
+
