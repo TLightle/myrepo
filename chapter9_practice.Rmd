@@ -1,8 +1,10 @@
 ---
-title: "Chapter 9 Practice: Data Dictionary"
+title: 'Chapter 9 Practice: Data Dictionary'
 author: "Tammy Lightle"
 date: "`r Sys.Date()`"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ## Load Data
@@ -113,6 +115,8 @@ data_dictionary[row, "Notes_Relationship"] <- "Band code for wild hatch birds is
 ```{r}
 table(field_sightings$Site_Code, useNA = "ifany")
 ```
+820 records from basin rim (BR), 737 records from lakeside cove (LC), 871 records from meadow ranch (MR), 649 records from north pool (NP), 743 records from south riprarian (SR), and 650 records from willow channel (WC).
+
 ```{r}
 row <- which(data_dictionary$Field_Name == "Site_Code")
 
