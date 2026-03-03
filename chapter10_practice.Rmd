@@ -1,0 +1,151 @@
+---
+title: "Chapter 10 Practice"
+author: "Tammy Lightle"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+## Setup
+```{r results = 'hide'}
+library(dslabs)
+
+gapminder <- dslabs::gapminder
+?gapminder
+
+colnames(gapminder)
+```
+## Task 1: Pick a year
+```{r}
+unique(gapminder$year)
+
+target_year <- 2010
+```
+
+## Task 2: Pick regions
+```{r}
+unique(gapminder$region)
+
+region_1 <- "Central Asia"
+region_2 <- "Southern Asia"
+```
+I picked Central Asia and Southern Asia as my target regions because photos from these regions are spectacular and I'd like to learn more about the cultures.
+
+## Task 3: Narrow down choices
+```{r}
+is_year <- gapminder$year == target_year
+is_region <- gapminder$region %in% c(region_1, region_2)
+
+keep <- is_year & is_region
+
+focus_pool <- gapminder[keep, ]
+```
+
+I am keeping all rows where the year equals the target year (2010) *and* the region is either Central Asia or Southern Asia. Specifically, by using `%in%`, I am grabbing all rows where the region is in the subset of `region_1` and `region_2`. Using `&` is specifying that I want both the year and the region selection to be true. I also used `$` because I want to call out the column in the dataset.
+
+My result is 13 rows (locations).
+
+```{r}
+#compare original dataset to focused subset
+nrow(focus_pool) == nrow(gapminder)
+```
+The result is false because the number of rows in each dataset is different.
+
+```{r}
+nrow(focus_pool) < nrow(gapminder)
+```
+As expected, `focus_pool` has less rows because it is a subset of `gapminder`.
+
+## Task 4: Negative indexes
+```{r}
+brief_sheet <- focus_pool[, -c(6:9)]
+names(brief_sheet)
+```
+`brief_sheet` dropped columns 6-9 from `focus_pool` because we want to focus on factors deemed most-important for vaccine distribution (though I'd argue that gdp might be worth considering).
+
+## Task 5: Inspect ranges
+```{r}
+# life expectancy (a)
+range(brief_sheet$life_expectancy, na.rm = TRUE)
+sum(brief_sheet$life_expectancy <= 70)
+```
+The range of life expectancy in `brief_sheet` is from 64.5 to 79.2 years. There are 7 countries with life expectancy less than or equal to 70 years.
+
+```{r}
+# infant mortality (b)
+range(brief_sheet$infant_mortality, na.rm = TRUE)
+sum(brief_sheet$infant_mortality >= 35)
+```
+The range of infant mortality in `brief_sheet` is from 9.4 to 73.5 deaths per 1000 live births. There are 7 countries with infant mortality greater than or equal to 35 deaths per 1000 live births.
+
+```{r}
+# fertility (c)
+range(brief_sheet$fertility, na.rm = TRUE)
+sum(brief_sheet$fertility >= 2.5)
+```
+The range of fertility in `brief_sheet` is from 1.90 to 3.78 average children per woman. There are 6 countries with fertility greater than or equal to 2.5 children per woman.
+
+## Task 6: Set thresholds
+```{r}
+a <- 70
+b <- 35
+c <- 2.5
+
+# combine conditions
+needs_screen <- brief_sheet[
+  brief_sheet$life_expectancy <= a &
+  brief_sheet$infant_mortality >= b &
+  brief_sheet$fertility >= c,
+]
+
+nrow(needs_screen)
+```
+Inspecting the ranges and number of rows that meet the condition allowed me to pick a threshold that was near mid-point of my subset. Finally, looking for countries that meet all three conditions left a list of 3 countries. India, Nepal, and Pakistan all have a life expectancy of less than or equal to 70 years, infant mortality of greater than or equal to 35 deaths per 1000, *and* fertility average of greater than or equal to 2.5 children per woman.
+
+## Task 7: `|` vs `%in%`
+```{r}
+A_or_B <- gapminder[
+  gapminder$year == target_year &
+    (gapminder$region == region_1 | gapminder$region == region_2),
+]
+
+in_set <- gapminder[
+  gapminder$year == target_year &
+    gapminder$region %in% c(region_1, region_2),
+]
+
+nrow(A_or_B) == nrow(in_set)
+```
+Both `%in%` and `|` can be used to get the same output, however `%in%` is preferred because it creates a more concise and readable code.
+
+## Task 8: Using `which`
+```{r}
+range(needs_screen$population, na.rm = TRUE)
+```
+Whoops, I'll make a new dataframe because `needs_screen` does not have that column.
+
+```{r}
+needs_screen_2 <- focus_pool[
+  focus_pool$life_expectancy <= a &
+  focus_pool$infant_mortality >= b &
+  focus_pool$fertility >= c,
+]
+
+range(needs_screen_2$population, na.rm = TRUE)
+```
+```{r}
+idx <- which(needs_screen_2$population >= 2e6 & needs_screen_2$population <= 5e7)
+length(idx)
+```
+```{r}
+shortlist <- needs_screen_2[idx, ]
+shortlist[, c("country", "population", "life_expectancy", "infant_mortality", "fertility")]
+```
+`which` returns the position of the row that meets the population range of 2e6 through 5e7. Nepal meets this criteria.
+
+## Task 9: negative vs not vs not equal
+`-`, `!`, and `!=` can be used to create the same output. However, the order that they are used in your code will need to differ. For example, all three of these are the same: `-c(3,4)`, `!c(3,4)`, and `(!= 3 | != 4)`.
+
+
+

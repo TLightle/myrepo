@@ -1,0 +1,85 @@
+---
+title: "Chapter 10 notes"
+author: "Tammy Lightle"
+date: "`r Sys.Date()`"
+output: html_notebook
+---
+
+# And, Or, and Membership
+
+data("mtcars")
+?mtcars
+View(mtcars)
+
+```{r}
+mtcars[1:6,]
+head(mtcars)
+```
+```{r}
+no_cat <- mtcars[, -c(8,9)]
+```
+
+```{r}
+mtcars$cyl != 4
+mtcars$cyl
+
+not4 <- mtcars[mtcars$cyl != 4, ]
+
+not4_bang <- mtcars[!(mtcars$cyl == 4), ]
+
+head(not4_bang == not4)
+```
+```{r}
+sum(mtcars$mpg <= 15)
+
+selection <- mtcars[mtcars$hp >= 100, -c(3,5,8:9)]
+
+ncol(selection) == ncol(mtcars) - length(c(3,5,8:9))
+```
+```{r}
+is_auto <- mtcars$am == 0
+mpg_22_or_less <- mtcars$mpg <= 22
+
+keep_rows <- is_auto & mpg_22_or_less
+sum(keep_rows)
+
+auto_mpg_22_or_less <- mtcars[mtcars$am == 0 & mtcars$mpg <= 22, ]
+
+head(auto_mpg_22_or_less)
+nrow(auto_mpg_22_or_less)
+```
+```{r}
+four_or_eight <- mtcars[mtcars$cyl == 4 | mtcars$cyl == 8, ]
+
+head(four_or_eight)
+unique(four_or_eight$cyl)
+```
+
+```{r}
+four_or_eight_2 <- mtcars[mtcars$cyl %in% c(4,8), ]
+nrow(four_or_eight) == nrow(four_or_eight_2)
+
+carb_4_6_8 <- mtcars[mtcars$carb %in% c(3,4,6,8), ]
+```
+
+```{r}
+maybe_wrong <- mtcars[mtcars$am == 0 & mtcars$mpg >= 25 | mtcars$wt < 2.5, ]
+head(maybe_wrong)
+
+intended <- mtcars[mtcars$am == 0 & (mtcars$mpg >= 25 | mtcars$wt < 2.5), ]
+head(intended)
+```
+
+```{r}
+light_midpower <- mtcars[
+  mtcars$wt < 3 &
+    mtcars$hp >= 110 &
+    mtcars$hp <= 180 &
+    mtcars$cyl %in% c(4,6), ]
+
+head(light_midpower)
+range(light_midpower$hp)
+```
+
+
+
