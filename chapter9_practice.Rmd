@@ -59,7 +59,7 @@ table(field_sightings$Sex_Code, useNA = "ifany")
 ```
 1,985 female (code = 1) and 1,801 male (code = 2), and 684 undetermined (left blank).
 
-## Subassignment
+## Subassignment: Sex_Code
 ```{r}
 row <- which(data_dictionary$Field_Name == "Sex_Code")
 row
@@ -74,6 +74,56 @@ data_dictionary[row, "Notes_Relationship"] <- "Matches sex (f/m); more NA for wi
 
 tail(data_dictionary)
 ```
+
+## Subassignment: Age_Code
+```{r}
+table(field_sightings$Age_Code, useNA = "ifany")
+```
+Age code (1) is hatch-year (n = 1,238), age code (2) is second-year (n = 1,094), age code (3) is adult (n = 1,742), and age code (99) is undertermined.
+
+```{r}
+row <- which(data_dictionary$Field_Name == "Age_Code")
+
+data_dictionary[row, "Meaning"] <- "Age of the bird derived from known hatch year or visually estimated for wild hatch."
+data_dictionary[row, "Units"] <- "N/A"
+data_dictionary[row, "Codes_Values"] <- "1 = hatch-year, 2 = second-year, 3 = adult, 99 = unknown"
+data_dictionary[row, "Missing_Values"] <- "NA and 99 mean age could not be determined"
+data_dictionary[row, "Valid_Values"] <- "1, 2, 3, 99, or NA"
+data_dictionary[row, "Notes_Relationship"] <- "Age code for wild hatch birds is estimated visually or unknown"
+```
+
+## Subassignment: Band_Color
+```{r}
+table(field_sightings$Band_Color, useNA = "ifany")
+```
+Band color encodes hatch year of birds from the reintroduction program. Silver is 2023 (n = 67), blue is 2024 (n = 138), green is 2025 (n = 97), and none indicates a wild-hatch bird (n = 4168).
+
+```{r}
+row <- which(data_dictionary$Field_Name == "Band_Code")
+
+data_dictionary[row, "Meaning"] <- "Color of the bird's leg band."
+data_dictionary[row, "Units"] <- "N/A"
+data_dictionary[row, "Codes_Values"] <- "Silver = 2023, Blue = 2024, Green = 2025, None = no band"
+data_dictionary[row, "Missing_Values"] <- "None means the bird does not have a leg band"
+data_dictionary[row, "Valid_Values"] <- "Silver, Blue, Green, None"
+data_dictionary[row, "Notes_Relationship"] <- "Band code for wild hatch birds is None"
+```
+
+## Subassignment: Site_Code
+```{r}
+table(field_sightings$Site_Code, useNA = "ifany")
+```
+```{r}
+row <- which(data_dictionary$Field_Name == "Site_Code")
+
+data_dictionary[row, "Meaning"] <- "Wetland location."
+data_dictionary[row, "Units"] <- "N/A"
+data_dictionary[row, "Codes_Values"] <- "BR = Basin Rim, LC = Lakeside Cove, MR = Meadow Ranch, NP = North Pool, SR = South Riparian, WC = Willow Channel"
+data_dictionary[row, "Missing_Values"] <- "N/A"
+data_dictionary[row, "Valid_Values"] <- "BR, LC, MR, NP, SR, WC"
+data_dictionary[row, "Notes_Relationship"] <- "N/A"
+```
+
 
 ## Save file
 ```{r}

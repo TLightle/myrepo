@@ -3,7 +3,7 @@
 "Observer_ID","","character","","","","","",NA
 "Date","","Date","","","","","",NA
 "Time","","hms, difftime","","","","","",NA
-"Site_Code","","character","","","","","",NA
+"Site_Code","Wetland location.","character","N/A","BR = Basin Rim, LC = Lakeside Cove, MR = Meadow Ranch, NP = North Pool, SR = South Riparian, WC = Willow Channel","N/A","BR, LC, MR, NP, SR, WC","","N/A"
 "Latitude","","numeric","","","","","",NA
 "Longitude","","numeric","","","","","",NA
 "Species_Common","","character","","","","","",NA
@@ -14,7 +14,7 @@
 "Bird_ID","","character","","","","","",NA
 "Distance_m","","numeric","","","","","",NA
 "Age_Class","","character","","","","","",NA
-"Age_Code","","numeric","","","","","",NA
+"Age_Code","Age of the bird derived from known hatch year or visually estimated for wild hatch.","numeric","N/A","1 = hatch-year, 2 = second-year, 3 = adult, 99 = unknown","NA and 99 mean age could not be determined","1, 2, 3, 99, or NA","","Age code for wild hatch birds is estimated visually or unknown"
 "Sex","","character","","","","","",NA
 "Sex_Code","Sex of the bird when it could be determined visually.","numeric","N/A","1 = female, 2 = male","NA means sex could not be determined","1, 2, or NA","","Matches sex (f/m); more NA for wild hatch hatch-year birds."
 "Release_Year","","numeric","","","","","",NA
