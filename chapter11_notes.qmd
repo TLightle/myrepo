@@ -1,0 +1,108 @@
+---
+title: "Chapter 11 Notes"
+subtitle: "dplyr subsetting"
+author: "Tammy Lightle"
+date: today
+format: 
+  html:
+    code-fold: true
+execute:
+  warning: true
+  message: true
+---
+
+```{r}
+#| warning=FALSE
+#| 
+library(dslabs)
+library(dplyr)
+```
+
+# 4 The Pipe
+
+```{r}
+mtcars %>%
+  head()
+```
+
+# 5 Selecting Columns
+
+```{r}
+select(mtcars, mpg, cyl, hp)
+```
+
+```{r}
+select(mtcars, -gear)
+```
+
+```{r}
+mtcars %>%
+  select(mpg, cyl, hp)
+```
+
+```{r}
+?gapminder
+
+I_Demo <- gapminder %>%
+  select(country, year, infant_mortality, continent)
+
+head(I_Demo)
+```
+
+```{r}
+colnames(gapminder)
+```
+
+```{r}
+my_choice <- gapminder %>%
+  select("year", "population", "gdp")
+
+head(my_choice)
+```
+
+```{r}
+mtcars %>% filter(mpg >= 25)
+```
+
+```{r}
+?murders
+
+nrow(murders)
+
+unique(murders$state)
+```
+
+```{r}
+no_washington <- murders %>%
+  filter(state != "District of Columbia")
+
+nrow(no_washington)
+```
+
+```{r}
+filter(mtcars, mpg >= 25, cyl == 4)
+filter(mtcars, mpg >= 25 & cyl == 4)
+```
+
+```{r}
+efficient <- mtcars %>%
+  filter(mpg >= 25, cyl == 4)
+```
+
+```{r}
+alaska_disease <- us_contagious_diseases %>%
+  filter(state == "Alaska", year >= 1990) %>%
+  select(year, disease, count)
+
+head(alaska_disease)
+```
+
+```{r}
+powerful_auto <- mtcars %>%
+  filter(am == 0, hp > 150) %>%
+  select(hp, mpg)
+
+head(powerful_auto)
+
+nrow(powerful_auto)
+```

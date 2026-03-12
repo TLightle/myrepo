@@ -1,0 +1,92 @@
+---
+title: "Chapter 11 Practice"
+author: "Tammy Lightle"
+date: today
+format: html
+editor: visual
+---
+
+## Task 0: Load packages
+
+```{r}
+#| warning: false
+
+library(dslabs)
+library(dplyr)
+```
+
+## Task 1: Column Selection
+
+```{r}
+C_Overload <- select(temp_carbon, year, carbon_emissions)
+
+head(C_Overload)
+```
+
+Select kept the two columns: year and carbon_emissions. Head verified this by showing the top 6 rows.
+
+## Task 2: Single-Column Dataframe
+
+```{r}
+star_names <- stars %>%
+  select(star)
+
+head(star_names)
+```
+
+This returns a one-column data frame, with the column `star`.
+
+## Task 3: Row Filtering
+
+```{r}
+unique(murders$state)
+
+No_Florida <- murders %>%
+  filter(state != "Florida")
+
+unique(No_Florida$state)
+```
+
+Pre-checking the values may be useful so that you know what states exist in the original dataset. In the verify step, I should not see Florida listed. All rows where Florida is the state are removed from the No_Florida data frame.
+
+## Task 4: Multiple Conditions
+
+```{r}
+summary(mtcars$qsec)
+
+Fast_n_Furious <- mtcars %>%
+  filter(am == 1,
+         cyl == 8,
+         qsec < 15)
+
+head(Fast_n_Furious)
+nrow(Fast_n_Furious)
+```
+
+I filtered out all cars that meet three conditions. First, the car must have a manual transmission (`am == 1`). Second, the car must have eight cylinders (`cyl == 8`). Finally, the car must have a 1/4 mile time of less than 15 seconds (`qsec < 15`). Two cars meet all of these conditions.
+
+## Task 5: MISSING
+
+## Task 6: OR Logic + Column Slice
+
+```{r}
+range(mtcars$disp)
+
+filtered_cars <- mtcars %>%
+  filter(disp < 160 | disp > 250) %>%
+  select(1:3)
+
+all(filtered_cars$disp > 250 | filtered_cars$disp < 160)
+```
+
+There are 27 cars that have a displacement of less than 160 or greater than 250. Using `all()` shows that each row meets that criteria.
+
+## Task 7: Reflection
+
+I find that using the `dplyr` verbs of `select()` and `filter()` is more straightforward than the base-R brackets `[]` for subsetting. It is easier to read a long code section that uses the `%>%` operator!
+
+## Task 8: Self-check checklist
+
+Sanity check - passed!
+
+##  
