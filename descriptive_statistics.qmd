@@ -34,8 +34,6 @@ The data have three penguin species observed in the Palmer Archipelago, Antartic
 
 ## Data type
 
-### Step 1
-
 What are the column names in this dataset?
 
 The column names in the dataset `penguins` are `{r} colnames(penguins)`.
@@ -55,6 +53,8 @@ The `body_mass_g` column is stored as `{r} class(penguins$body_mass_g)` in R. Th
 The `sex` column is stored as `{r} class(penguins$sex)` in R. It has the unique values: `{r} unique(penguins$sex)`.
 
 The `year` column is stored as `{r} class(penguins$year)` in R.
+
+This dataset is a sample because it represents a subset of the penguin population which was observed, not a count or measurement of the entire penguin population. Species, island, and sex are categorical whereas bill length, bill depth, flipper length, and body mass are numerical. It would make sense to count the categorical variables, and summarize the numerical variables with mean, median, and spread. Year is stored as numeric, but should be interpreted carefully before averaging.
 
 # Part 2
 
