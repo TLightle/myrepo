@@ -1,0 +1,85 @@
+---
+title: "Signature Assignment"
+subtitle: "Descriptive Statistics"
+author: "Tammy Lightle"
+date: today
+toc: true
+toc-depth: 2
+number-sections: true
+format: 
+  html:
+    code-fold: true
+execute:
+  warning: true
+  message: true
+editor: visual
+---
+
+# Part 1
+
+## Load packages and data
+
+```{r}
+#| warning: false
+
+library(dslabs)
+library(dplyr)
+library(palmerpenguins)
+data("penguins")
+```
+
+The data have three penguin species observed in the Palmer Archipelago, Antartica, collected by Dr. Kristen Gorman with Palmer Station LTER.
+
+**Research question: How do penguin body measurements differ by species, sex, and island in the Palmer Archipelago?**
+
+## Data type
+
+### Step 1
+
+What are the column names in this dataset?
+
+The column names in the dataset `penguins` are `{r} colnames(penguins)`.
+
+The `species` column is stored as `{r} class(penguins$species)` in R. It has the unique values: `{r} unique(penguins$species)`.
+
+The `island` column is stored as `{r} class(penguins$island)` in R. It has the unique values: `{r} unique(penguins$island)`.
+
+The `bill_length_mm` column is stored as `{r} class(penguins$bill_length_mm)` in R. The data are continuous.
+
+The `bill_depth_mm` column is stored as `{r} class(penguins$bill_depth_mm)` in R. The data are continuous.
+
+The `flipper_length_mm` column is stored as `{r} class(penguins$flipper_length_mm)` in R. The data are continuous.
+
+The `body_mass_g` column is stored as `{r} class(penguins$body_mass_g)` in R. The data are continuous.
+
+The `sex` column is stored as `{r} class(penguins$sex)` in R. It has the unique values: `{r} unique(penguins$sex)`.
+
+The `year` column is stored as `{r} class(penguins$year)` in R.
+
+# Part 2
+
+## Length
+
+## Count
+
+## Mode
+
+## Median
+
+## Mean
+
+# Part 3
+
+## Spread
+
+## Standard Deviation
+
+## Range
+
+## IQR
+
+## Five Number Summary
+
+# Part 4
+
+## Describing data with `dplyr`
