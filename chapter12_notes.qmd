@@ -1,0 +1,49 @@
+---
+title: "Chapter 12 Notes"
+subtitle: "mutate() and case_when()"
+author: "Tammy Lightle"
+date: today
+toc: true
+toc-depth: 2
+number-sections: true
+format: 
+  html:
+    code-fold: true
+execute:
+  warning: true
+  message: true
+editor: visual
+---
+
+# Quarto Notes
+
+# Load Packages
+
+```{r}
+#| warning: false
+
+library(dslabs)
+library(dplyr)
+```
+
+# Vectorized Conditionals
+
+## ifelse()
+
+## case_when()
+
+## More than two categories
+
+### Nested ifelse()
+
+### Multiple rule case_when()
+
+# Mutate
+
+## Column copy
+
+### Mutate with arithmetic
+
+### case_when() inside mutate()
+
+## Overwrite Column Values

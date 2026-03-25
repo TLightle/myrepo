@@ -1,0 +1,109 @@
+---
+title: "Chapter 12 Practice"
+author: "Tammy Lightle"
+date: today
+toc: true
+toc-depth: 2
+number-sections: true
+format: 
+  html:
+    code-fold: true
+    self-contained: true
+execute:
+  warning: true
+  message: true
+editor: visual
+---
+
+## Setup
+
+Load libraries
+
+```{r}
+#| warning: false
+
+library(dplyr)
+library(dslabs)
+```
+
+## Task 1: Concept check
+
+Vectorized conditional functions such as ifelse() and case_when() returns a new vector with one result for every position because each element is evaluated and returned, producing a vector of the same length as the original.
+
+## Task 2: Simple ifelse()
+
+Inspect dslabs::heights
+
+```{r}
+heights <- dslabs::heights
+names(heights)
+```
+
+The heights data frame has two columns, sex and height.
+
+Assign "Tall" to heights greater than 68, and "Not Tall" to all others.
+
+```{r}
+height_label <- ifelse(
+  heights$height > 68,
+  "Tall",
+  "Not Tall"
+)
+
+table(height_label)
+```
+
+There are 542 entries with a height over 68, and 508 entries otherwise.
+
+## Task 3: Recode with mutate() and case_when()
+
+Assign mpg classes to mtcars dataset.
+
+```{r}
+mpg_recode <- mtcars %>%
+  mutate(mpg_class = case_when(mpg > 25 ~ "High MPG",
+                               mpg < 15 ~ "Low MPG",
+                               TRUE ~ "Medium MPG"))
+
+table(mpg_recode$mpg_class)
+```
+
+6 cars have mpg greater than 25 (high mpg), 21 cars have mpg between 15 and 25 (medium mpg), and 5 cars have mpg less than 15 (low mpg). Regardless, everyone is suffering with the increased gas prices.
+
+## Task 4: Recode: name focus
+
+Assign temperature group to each star based on their tempature.
+
+```{r}
+# inspect stars dataset
+stars <- dslabs::stars
+colnames(stars)
+summary(stars$temp)
+
+# code stars based on temp range
+stars_recode <- stars %>%
+  mutate(temp_group = case_when(temp < 4000 ~ "Cool",
+                                temp <= 7500 ~ "warm",
+                                TRUE ~ "Hot"))
+
+table(stars_recode$temp_group)
+```
+
+There are 35 stars in the Cool category, 23 stars in the Warm category, and 38 stars in the Hot category.
+
+## Task 5: Unit conversion with mutate()
+
+Convert the height column from inches into cm.
+
+```{r}
+# inspect heights
+head(heights)
+
+# convert height in inches to cm
+international_friendly_heights <- heights %>%
+  mutate(height = height * 2.54)
+
+head(international_friendly_heights)
+```
+
+The height column in `international_friendly_heights` is now in cm. The column replaced the original column that was in inches, therefore the data frame still has a total of 2 columns.
