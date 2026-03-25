@@ -9,6 +9,7 @@ number-sections: true
 format: 
   html:
     code-fold: true
+    self-contained: true
 execute:
   warning: true
   message: true
@@ -60,13 +61,174 @@ This dataset is a sample because it represents a subset of the penguin populatio
 
 ## Length
 
+How many values are in the `mpg` column of `mtcars`?
+
+```{r}
+n <- length(mtcars$mpg)
+```
+
+There are `{r} length(mtcars$mpg)` values in the `mpg` column of `mtcars`.
+
 ## Count
+
+Find the frequency of each value in the `cyl` column of `mtcars`.
+
+```{r}
+cyl_counts <- mtcars %>%
+  count(cyl)
+
+cyl_counts
+```
 
 ## Mode
 
+The mode of `mtcars$cyl` is 8 cylinders, which occurs 14 times.
+
+## Task 1: Count-based summaries
+
+**Step 1: choose appropriate variables**
+
+1.  I could use length() on any column in order to figure out how many rows are in the column.
+2.  I could use count() on the categorical columns to figure out the frequency of each category. These columns are `species`, `island`, and `sex`.
+3.  Mode() could be useful on any column, depending on the question that is trying to be answered. Let's choose `year` to learn which year has the most observations present.
+
+**Step 2: Length report**
+
+The `species` column in the `penguins` dataset contains `{r} length(penguins$species)` observations.
+
+I chose `species` for length() because it is a `{r} class(penguins$species)` variable. It makes sense to use length() because I want to know how many species observations exist in the dataset.
+
+**Step 3: Frequency table**
+
+Create frequency table for `island`.
+
+```{r}
+island_counts <- penguins %>%
+  count(island)
+
+island_counts
+```
+
+There were 168 observations on Biscoe, 124 observations on Dream, and 52 observations on Torgersen.
+
+**Step 4: Identify the mode**
+
+The mode of `island` is Biscoe, which makes up `{r} penguins %>% filter(island == "Biscoe") %>% count()` out of `{r} length(penguins$island)` total observations. I chose `island` for count() because it is a `{r} class(penguins$island)` variable. It makes sense to use count because I wanted to know the frequency of each category.
+
 ## Median
 
+Calculate the median of the `mpg` column of `mtcars`.
+
+**Step 1: Inspect and sort**
+
+```{r}
+print(mtcars$mpg)
+
+# sort ascending
+sorted_data <- sort(mtcars$mpg)
+sorted_data
+```
+
+The `mpg` column in the `mtcars` dataset sorted in ascending order is: `{r} sorted_data`.
+
+**Step 2: Find the sample size**
+
+```{r}
+length(sorted_data)
+```
+
+There are `{r} length(sorted_data)` values.
+
+**Step 3: Find the median**
+
+Use formula for even number of values.
+
+```{r}
+median_value <- (sorted_data[16] + sorted_data[17]) / 2
+
+median_value
+
+median(mtcars$mpg)
+```
+
+The median of the `mpg` column in the `mtcars` dataset is `{r} median(mtcars$mpg)`.
+
+## Task 2: Calculate median
+
+Calculate median of a column in `penguins` dataset.
+
+```{r}
+median(penguins$bill_length_mm, na.rm = TRUE)
+```
+
+The median of the `bill_length_mm` column in the `penguins` dataset is `{r} median(penguins$bill_length_mm, na.rm = TRUE)`.
+
+I chose the `bill_length_mm` variable from the `penguins` dataset to describe with a median because it is a `{r} class(penguins$bill_length_mm)` variable that may contain outliers. The median is a better measure of center for this variable because it is not affected by extreme values, unlike the mean. Using the median allows us to get a more accurate representation of the typical value in the dataset for this variable.
+
 ## Mean
+
+**Step 1: Count number of values**
+
+```{r}
+n <- length(mtcars$mpg)
+```
+
+**Step 2: Sum mpg values**
+
+```{r}
+sum_x <- sum(mtcars$mpg)
+
+sum_x
+```
+
+The sum of the `mpg` column in the `mtcars` dataset is `{r} sum(mtcars$mpg)`.
+
+**Step 3: Calculate mean**
+
+```{r}
+x_bar <- sum_x / n
+
+x_bar
+mean(mtcars$mpg)
+```
+
+The mean of the values in the `mpg` column of the `mtcars` dataset is `{r} mean(mtcars$mpg)`.
+
+## Task 3: Calculate mean
+
+Calculate the mean of a column in the `penguins` dataset. I'll choose the `bill_length_mm` column.
+
+```{r}
+mean(penguins$bill_length_mm, na.rm = TRUE)
+```
+
+The mean of the `bill_length_mm` column in the `penguins` dataset is `{r} mean(penguins$bill_length_mm, na.rm = TRUE)`.
+
+I chose the `bill_length_mm` variable from the `penguins` dataset to describe with a median because it is a `{r} class(penguins$bill_length_mm)` variable. The mean is a good measure of center for this variable because it takes into account all values in the dataset and provides an average that represents the typical value.
+
+## Task 4: Compare measures of center
+
+For the `bill_length_mm` column, the median is `{r} median(penguins$bill_length_mm, na.rm = TRUE)` and the mean is `{r} mean(penguins$bill_length_mm, na.rm = TRUE)`. The mean and the median are close together, however not exact. The mean is less than the median, indicating a negatively skewed distribution, though not much.
+
+There are not unusually high or low values, so the mean would be the better measure to report for this variable because it represents the full dataset. If, however, you had a variable with high or low outliers, the median would be the better measure to report because it is not affected by those outliers.
+
+## Task 5: Compare measures of center
+
+I'll chose `bill_length_mm` as my numerical variable and `island` as my categorical grouping variable to compare bill length by island. Maybe the food source at each island is different, and therefore the penguins have evolved with different bill lengths.
+
+Since we learned in Task 4 that there are not outliers in the `bill_length_mm` variable, I'll calculate the mean for each group.
+
+```{r}
+mean(penguins$bill_length_mm[penguins$island == "Torgersen"], na.rm = TRUE)
+mean(penguins$bill_length_mm[penguins$island == "Biscoe"], na.rm = TRUE)
+mean(penguins$bill_length_mm[penguins$island == "Dream"], na.rm = TRUE)
+```
+
+The mean bill length for penguins observed on Torgersen is `{r} mean(penguins$bill_length_mm[penguins$island == "Torgersen"], na.rm = TRUE)` mm, while the mean bill length for penguins observed on Biscoe is `{r} mean(penguins$bill_length_mm[penguins$island == "Biscoe"], na.rm = TRUE)` mm, and the mean bill length for penguins observed on Dream is `{r} mean(penguins$bill_length_mm[penguins$island == "Dream"], na.rm = TRUE)` mm.
+
+There is a difference in the mean bill length among penguins observed on different islands, however, more research will need to be done to determine if this is of significance. Early observations show that the average bill length of penguins observed on Biscoe is about `{r} round(mean(penguins$bill_length_mm[penguins$island == "Biscoe"], na.rm = TRUE) - mean(penguins$bill_length_mm[penguins$island == "Torgersen"], na.rm = TRUE), 2)` mm greater than those observed on Torgersen.
+
+Shown in Task 1, Torgersen had much fewer observations than both Biscoe and Dream. This difference in number of observations may help explain the difference in mean bill lengths. Solely looking at the mean is not enough to tell if the island has a significant effect on the penguin's bill length.
 
 # Part 3
 
