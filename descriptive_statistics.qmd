@@ -59,31 +59,6 @@ This dataset is a sample because it represents a subset of the penguin populatio
 
 # Part 2
 
-## Length
-
-How many values are in the `mpg` column of `mtcars`?
-
-```{r}
-n <- length(mtcars$mpg)
-```
-
-There are `{r} length(mtcars$mpg)` values in the `mpg` column of `mtcars`.
-
-## Count
-
-Find the frequency of each value in the `cyl` column of `mtcars`.
-
-```{r}
-cyl_counts <- mtcars %>%
-  count(cyl)
-
-cyl_counts
-```
-
-## Mode
-
-The mode of `mtcars$cyl` is 8 cylinders, which occurs 14 times.
-
 ## Task 1: Count-based summaries
 
 **Step 1: choose appropriate variables**
@@ -115,44 +90,6 @@ There were 168 observations on Biscoe, 124 observations on Dream, and 52 observa
 
 The mode of `island` is Biscoe, which makes up `{r} penguins %>% filter(island == "Biscoe") %>% count()` out of `{r} length(penguins$island)` total observations. I chose `island` for count() because it is a `{r} class(penguins$island)` variable. It makes sense to use count because I wanted to know the frequency of each category.
 
-## Median
-
-Calculate the median of the `mpg` column of `mtcars`.
-
-**Step 1: Inspect and sort**
-
-```{r}
-print(mtcars$mpg)
-
-# sort ascending
-sorted_data <- sort(mtcars$mpg)
-sorted_data
-```
-
-The `mpg` column in the `mtcars` dataset sorted in ascending order is: `{r} sorted_data`.
-
-**Step 2: Find the sample size**
-
-```{r}
-length(sorted_data)
-```
-
-There are `{r} length(sorted_data)` values.
-
-**Step 3: Find the median**
-
-Use formula for even number of values.
-
-```{r}
-median_value <- (sorted_data[16] + sorted_data[17]) / 2
-
-median_value
-
-median(mtcars$mpg)
-```
-
-The median of the `mpg` column in the `mtcars` dataset is `{r} median(mtcars$mpg)`.
-
 ## Task 2: Calculate median
 
 Calculate median of a column in `penguins` dataset.
@@ -164,35 +101,6 @@ median(penguins$bill_length_mm, na.rm = TRUE)
 The median of the `bill_length_mm` column in the `penguins` dataset is `{r} median(penguins$bill_length_mm, na.rm = TRUE)`.
 
 I chose the `bill_length_mm` variable from the `penguins` dataset to describe with a median because it is a `{r} class(penguins$bill_length_mm)` variable that may contain outliers. The median is a better measure of center for this variable because it is not affected by extreme values, unlike the mean. Using the median allows us to get a more accurate representation of the typical value in the dataset for this variable.
-
-## Mean
-
-**Step 1: Count number of values**
-
-```{r}
-n <- length(mtcars$mpg)
-```
-
-**Step 2: Sum mpg values**
-
-```{r}
-sum_x <- sum(mtcars$mpg)
-
-sum_x
-```
-
-The sum of the `mpg` column in the `mtcars` dataset is `{r} sum(mtcars$mpg)`.
-
-**Step 3: Calculate mean**
-
-```{r}
-x_bar <- sum_x / n
-
-x_bar
-mean(mtcars$mpg)
-```
-
-The mean of the values in the `mpg` column of the `mtcars` dataset is `{r} mean(mtcars$mpg)`.
 
 ## Task 3: Calculate mean
 
@@ -206,7 +114,7 @@ The mean of the `bill_length_mm` column in the `penguins` dataset is `{r} mean(p
 
 I chose the `bill_length_mm` variable from the `penguins` dataset to describe with a median because it is a `{r} class(penguins$bill_length_mm)` variable. The mean is a good measure of center for this variable because it takes into account all values in the dataset and provides an average that represents the typical value.
 
-## Task 4: Compare measures of center
+## Task 4: Compare measures of center {#sec-center}
 
 For the `bill_length_mm` column, the median is `{r} median(penguins$bill_length_mm, na.rm = TRUE)` and the mean is `{r} mean(penguins$bill_length_mm, na.rm = TRUE)`. The mean and the median are close together, however not exact. The mean is less than the median, indicating a negatively skewed distribution, though not much.
 
@@ -232,15 +140,73 @@ Shown in Task 1, Torgersen had much fewer observations than both Biscoe and Drea
 
 # Part 3
 
-## Spread
+## Standard Deviation {#sec-sd}
 
-## Standard Deviation
+The standard deviation calculation is as follows: $$
+s = \sqrt{s^2} = \sqrt{\frac{\sum_{i=1}^{n}(x_i - \bar{x})^2}{n-1}}
+$$
 
-## Range
+Calculate the standard deviation for`body_mass_g`.
 
-## IQR
+```{r}
+sd(penguins$body_mass_g, na.rm = TRUE)
+```
 
-## Five Number Summary
+The standard deviation of the `body_mass_g` column in the `penguins` dataset is `{r} round(sd(penguins$body_mass_g, na.rm = TRUE), 2)`.
+
+::: callout-note
+I chose the `body_mass_g` variable because it is a numerical measurement. The standard deviation tells me how spread out the values are around the mean. A larger standard deviation means the values vary more, while a smaller standard deviation means the values are more tightly clustered.
+:::
+
+::: callout-note
+Compared with the center measures discussed in @sec-center, the standard deviation helps describe how much the values vary around the mean.
+:::
+
+## Range {#sec-range}
+
+Use `range()` to find the minimum and maximum of `body_mass_g`.
+
+```{r}
+penguin_range <- range(penguins$body_mass_g, na.rm = TRUE)
+
+penguin_range
+```
+
+```{r}
+penguin_range_value <- penguin_range[2] - penguin_range[1]
+```
+
+-   **Minimum:** `{r} range(penguins$body_mass_g, na.rm = TRUE)[1]`
+
+-   **Maximum:** `{r} range(penguins$body_mass_g, na.rm = TRUE)[2]`
+
+-   **Range:** `{r} diff(range(penguins$body_mass_g, na.rm = TRUE))`
+
+## Interquartile Range {#sec-iqr}
+
+Calculate the interquartile range of `body_mass_g`.
+
+```{r}
+iqr_value <- IQR(penguins$body_mass_g, na.rm = TRUE)
+```
+
+The interquartile range of the `body_mass_g` column in the `penguins` dataset is `{r} iqr_value`.
+
+The IQR describes the spread of the middle 50% of the data. It is useful because it is less affected by unusually high or low values than the full range. This makes it a strong choice when I want to describe the spread of the typical values in the dataset.
+
+## Five-Number Summary {#sec-five}
+
+Use `summary()` to get an overview.
+
+```{r}
+summary(penguins$body_mass_g)
+```
+
+In the `body_mass_g` column, the minimum value is `{r} summary(penguins$body_mass_g)[1]`, the median is `{r} summary(penguins$body_mass_g)[3]`, and the maximum is `{r} summary(penguins$body_mass_g)[5]`. The first and third quartiles show where the middle half of the data falls. This summary gives me a quick picture of both center and spread in this variable.
+
+## Early Takeaways
+
+For the `body_mass_g` variable, I think the most useful measure of spread is the IQR because it unaffected by the min and max values in the dataset.
 
 # Part 4
 
