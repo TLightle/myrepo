@@ -1,0 +1,90 @@
+---
+title: "Chapter 13 Practice"
+author: "Tammy Lightle"
+date: today
+toc: true
+toc-depth: 2
+number-sections: true
+format: 
+  html:
+    code-fold: true
+    self-contained: true
+execute:
+  warning: true
+  message: true
+editor: visual
+---
+
+```{r}
+#| warning: false
+
+library(dplyr)
+library(dslabs)
+```
+
+## Task 1: Single Grouping
+
+Compute the mean `temp` and mean `magnitude` for each star type in the `stars` dataset.
+
+```{r}
+twinkle_twinkle <- stars %>%
+  group_by(type) %>%
+  summarize(mean_temperature = mean(temp),
+            mean_magnitude = mean(magnitude),
+            .groups = "drop")
+
+twinkle_twinkle
+```
+
+The result is a 10x3 tibble with columns `type`, `mean_temperature`, and `mean_magnitude`. There are 10 star types total. Star type O has the highest mean temperature, and star type M has the lowest. Star type DB has the highest mean magnitude, while star type O has the lowest.
+
+## Task 2: Single Grouping + Three Stats
+
+Find the region with the highest mean percent `stearic` acid of sample in the `olive` dataset.
+
+```{r}
+
+Olive_Garden <- olive %>%
+  group_by(region) %>%
+  summarize(mean_value = mean(stearic),
+            sd_value = sd(stearic),
+            n = n())
+
+Olive_Garden
+```
+
+The highest mean percent `stearic` acid of sample was observed in Northern Italy. I wanted stats related to `stearic` acid, so that was the summary variable, and I wanted to view results by region, so `region` is the grouping variable.
+
+## Task 3: Counting Unique Values
+
+Determine the number of unique diseases in the `disease` column in the `us_contagious_diseases` dataset.
+
+```{r}
+length(unique(us_contagious_diseases$disease))
+```
+
+There are `{r} length(unique(us_contagious_diseases$disease))` unique diseases within the `disease` column in the `us_contagious_diseases` dataset. They are `{r} unique(us_contagious_diseases$disease)`.
+
+Next, determine the number of states represented in the `state` column.
+
+```{r}
+length(unique(us_contagious_diseases$state))
+```
+
+There are `{r} length(unique(us_contagious_diseases$state))` unique states within the `state` column of the `us_contagious_diseases` dataset.
+
+## Task 4: Make and Test a Prediction
+
+If every state has 7 diseases, I would expect 357 (51 \* 7) rows when grouping by `state` and `disease` because each row should represent one state/disease combination.
+
+Let's test:
+
+```{r}
+categorical_counts <- us_contagious_diseases %>%
+  group_by(state, disease) %>%
+  count()
+
+nrow(categorical_counts)
+```
+
+My prediction was correct. It is useful to use `group_by()` to find out the frequency of multiple categorical data.
