@@ -87,4 +87,24 @@ categorical_counts <- us_contagious_diseases %>%
 nrow(categorical_counts)
 ```
 
-My prediction was correct. It is useful to use `group_by()` to find out the frequency of multiple categorical data.
+My prediction was correct. It is useful to use `group_by()` to determine the frequency of multiple categorical data.
+
+## Task 5: National Mean Counts by Disease
+
+Calculate the national mean of `count` for each `disease` in the `us_contagious_diseases` dataset. Then keep only the three diseases with the highest national mean counts, and store as `Infectious_Burden`.
+
+```{r}
+Infectious_Burden <- us_contagious_diseases %>%
+  group_by(disease) %>%
+  summarize(mean_of_count = mean(count, na.rm = TRUE),
+            .groups = "drop") %>%
+  arrange(desc(mean_of_count))
+
+head(Infectious_Burden, 3)
+```
+
+The three diseases with the highest national mean counts are `{r} head(Infectious_Burden, 3)$disease`.
+
+## Task 6: Reflection
+
+To get separate results for each group, `group_by()` must be used prior to `summarize()` because that will ensure the summary happens **within** each group. If `summarize()` is used before `group_by()`, then the entire dataset would be summarized and then grouped, resulting in the summary column being equivalent across every group.
