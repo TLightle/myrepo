@@ -1,0 +1,48 @@
+---
+title: "Wildfire Signature Assignment"
+author: "Tammy Lightle"
+date: today
+toc: true
+toc-depth: 2
+number-sections: true
+format: 
+  html:
+    code-fold: true
+    self-contained: true
+execute:
+  warning: true
+  message: true
+editor: visual
+---
+
+## Load libraries and data
+
+Load the U.S. Forest Service's Wildfire Hazard Potential (WHP) dataset. The WHP is a unitless, continuous index, where a greater value is equivalent to a greater relative hazard.
+
+```{r}
+#| warning: false
+
+library(tidyverse)
+
+county_raw <- read.csv("whp_raw_sample.csv")
+
+colnames(county_raw)
+nrow(county_raw)
+head(county_raw)
+```
+
+The data frame has `{r} nrow(county_raw)` rows of data, and four columns: `{r} colnames(county_raw)`. Each row represents a raster cell with an associated wildfire hazard potential (`whp`). Because multiple raster cells can fall within a county, each county appears in multiple rows. The variables `county` and `county_fips` identify the county for each raster cell, and `cell_area_km2` represents the area (in square kilometers) of each cell.
+
+## Basic Summary
+
+Summarize the total number of raster cells (`n_rows`), the number of missing values in `whp`, and the minimum and maximum values of raster cell area.
+
+```{r}
+county_summary <- county_raw %>%
+  summarize(n_rows = n(),
+            n_wa_whp = sum(is.na(whp)),
+            min_area = min(cell_area_km2),
+            max_area = max(cell_area_km2))
+
+county_summary
+```
