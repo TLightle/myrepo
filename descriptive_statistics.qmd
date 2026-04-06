@@ -211,3 +211,60 @@ For the `body_mass_g` variable, I think the most useful measure of spread is the
 # Part 4
 
 ## Describing data with `dplyr`
+
+Choose at least three variables and filter based on certain criteria.
+
+```{r}
+penguins_wrangled <- penguins %>%
+  filter(!is.na(body_mass_g)) %>%
+  mutate(body_mass_kg = body_mass_g / 1000) %>%
+  filter(body_mass_kg > 5) %>%
+  select(body_mass_kg, species, sex)
+
+head(penguins_wrangled)
+```
+
+`body_mass_kg` is a new column, created by using `mutate()` and converting `body_mass_g` in grams to kilograms.
+
+## Summarize
+
+```{r}
+#| label: tbl-penguins-summary
+#| tbl-cap: "Mead, Median, and SD by species"
+
+penguins_table <- penguins %>%
+  filter(!is.na(flipper_length_mm), !is.na(species)) %>%
+  group_by(species) %>%
+  summarize(
+    "Mean Flipper Length (mm)" = mean(flipper_length_mm),
+    "Median Flipper Length (mm)" = median(flipper_length_mm),
+    "SD Flipper Length (mm)" = sd(flipper_length_mm),
+    "Num Cases" = n(),
+    .groups = "drop"
+  )
+
+knitr:: kable(penguins_table, digits = 1)
+
+```
+
+@tbl-penguins-summary shows the mean, median, standard deviation, and number of observations, by penguin species.
+
+## Analysis
+
+What is the heaviest animal measured in each year? Return `year`, `island`, `species`, and `body_mass_g`.
+
+```{r}
+#| label: tbl-penguins-analysis
+#| tbl-cap: ""
+
+penguins_by_mass <- penguins %>%
+  filter(!is.na(body_mass_g)) %>%
+  group_by(year) %>%
+  filter(body_mass_g == max(body_mass_g)) %>%
+  select("Year" = year, "Species" = species, "Island" = island, "Body Mass (g)" = body_mass_g) %>%
+  arrange(Year)
+
+knitr::kable(penguins_by_mass, digits = 1)
+```
+
+@tbl-penguins-analysis shows that for years 2007-2009, the Gentoo penguin was observed with the heaviest body mass, and this observation was on Biscoe island each time. Is it the same exact penguin each year??
