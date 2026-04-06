@@ -1,0 +1,100 @@
+---
+title: "Chapter 15 Practice"
+author: "Tammy Lightle"
+date: today
+toc: true
+toc-depth: 2
+number-sections: true
+format: 
+  html:
+    code-fold: true
+    self-contained: true
+execute:
+  warning: true
+  message: true
+editor: visual
+---
+
+## Task 1
+
+Simulate 300 rolls of a loaded or fair 20-sided die and store in `big_die`.
+
+```{r}
+set.seed(200)
+
+big_die <- sample(1:20, 300, TRUE)
+
+any(big_die == 20)
+```
+
+Rolling a fair 20-sided die 300 times resulted in at least one roll where the value = 20.
+
+## Task 2
+
+**Die test**
+
+Simulate 5,221 rolls of a fair 20-sided die. Create a table of how many times each face appeared.
+
+```{r}
+boring_weekend <- sample(1:20, 5221, TRUE)
+
+d20_counts <- table(boring_weekend)
+
+print(d20_counts)
+```
+
+What proportion of rolls were natural 20s?
+
+```{r}
+mean(boring_weekend == 20)
+```
+
+About `{r} round(mean(boring_weekend == 20) * 100, 1)`% of rolls were naturally 20.
+
+**Baby blanket test**
+
+Simulate 100 newborn lengths (inches) with mean 20.0, and sd 0.9. Check if there are any babies longer than 23 inches, and if so how many.
+
+```{r}
+blanketed_babies = rnorm(100, mean = 20.0, sd = 0.9)
+
+any(blanketed_babies > 23)
+sum(blanketed_babies > 23)
+```
+
+There are no babies that are longer than 23 inches. Based on this sample, the hospital does not need longer blankets.
+
+Now, simulate for 1,000 weeks. For each week, determine how many babies were longer than 23 inches.
+
+```{r}
+weeks_too_long <- replicate(1000, rnorm(100, mean = 20.0, sd = 0.9))
+
+any(weeks_too_long > 23)
+sum(weeks_too_long > 23)
+```
+
+This was a 1,000 week simulation where each week had 100 babies with a mean length of 20.0 inches and a standard deviation of 0.9. There were `{r} sum(weeks_too_long > 23)` instances where a baby was longer than 23 inches. The hospital's need for longer blankets is slim, and represents only `{r} round(mean(weeks_too_long > 23) * 100, 2)`% of babies born.
+
+```{r}
+threshold <- 23
+max_len <- max(weeks_too_long)
+min_len <- min(weeks_too_long)
+breaks_int <- seq(min_len - 1, max_len + 1, by = 0.5)
+
+hist(weeks_too_long,
+     breaks = breaks_int, 
+     col = "grey",
+     main = "Distribution of Baby Lengths (1000 reps of 100 babies)",
+     xlab = "Baby Lengths (in)")
+
+abline(v = threshold, col = "darkred", lwd = 2, lty = 2)
+abline(v = mean(weeks_too_long), col = "darkblue", lwd = 2, lty = 1)
+
+legend("topright",
+       legend = c("Max Blanket Length (23)", "Mean Length"),
+       col = c("darkred", "darkblue"),
+       lty = c(2, 1),
+       lwd = 2,
+       bg = "white",
+       bty = "o")
+```
