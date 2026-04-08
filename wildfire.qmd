@@ -9,51 +9,70 @@ format:
   html:
     code-fold: true
     self-contained: true
+    theme: cosmo
 execute:
   warning: true
   message: true
 editor: visual
 ---
 
-# Part A
-
-## Load libraries and data
-
-Load the U.S. Forest Service's Wildfire Hazard Potential (WHP) dataset. The WHP is a unitless, continuous index, where a greater value is equivalent to a greater relative hazard.
-
-```{r}
+```{r setup}
 #| warning: false
 
 library(tidyverse)
 
 county_raw <- read.csv("whp_raw_sample.csv")
 
+oxford_comma <- function(x) {
+  if(length(x) == 0) return("")
+  if(length(x) == 1) return(x)
+  if(length(x) == 2) return(paste(x, collapse = "and "))
+  paste0(paste(x[-length(x)], collapse = ", "), ", and ", x[length(x)])
+}
+```
+
+# Part A
+
+## Introduction
+
+This analysis uses the U.S. Forest Service's Wildfire Hazard Potential (WHP) dataset. WHP is a unitless, continuous index, where higher values indicate greater relative hazard. Each record represents a raster cell, including the county it belongs to, the county identifier, and the WHP value for that cell. Since multiple raster cells can fall within a county, each county appears in multiple rows.
+
+```{r}
+#| results: 'hide'
+
 colnames(county_raw)
 nrow(county_raw)
 head(county_raw)
 ```
 
-The data frame has `{r} nrow(county_raw)` rows of data, and four columns: `{r} colnames(county_raw)`. Each row represents a raster cell with an associated wildfire hazard potential (`whp`). Because multiple raster cells can fall within a county, each county appears in multiple rows. The variables `county` and `county_fips` identify the county for each raster cell, and `cell_area_km2` represents the area (km^2^) of each cell.
+The dataset contains four columns: `{r} oxford_comma(colnames(county_raw))`.
 
-## Basic Summary
+-   `whp` is `{r} class(county_raw$whp)`, and ranges from `{r} min(county_raw$whp)` to `{r} max(county_raw$whp)`.
 
-Summarize the total number of raster cells (`n_rows`), the number of missing values in `whp`, and the minimum and maximum values of raster cell area.
+-   `county` is `{r} class(county_raw$county)`.
+
+-   `county_fips` is `{r} class(county_raw$county_fips)`, but acts as an identifier and is not intended to be used in calculations.
+
+-   `cell_area_km2` is `{r} class(county_raw$cell_area_km2)`, and ranges from `{r} min(county_raw$cell_area_km2)` km^2^ to `{r} max(county_raw$cell_area_km2)` km^2^ .
 
 ```{r}
+#| results: 'hide'
+
 county_summary <- county_raw %>%
   summarize(n_rows = n(),
             n_na_whp = sum(is.na(whp)),
+            n_na_area = sum(is.na(cell_area_km2)),
             min_area = min(cell_area_km2),
             max_area = max(cell_area_km2))
 
 county_summary
 ```
 
-There are no NA values in `whp`, indicating that each row has a valid value. The range of raster cell area is only `{r} county_summary$max_area - county_summary$min_area` km^2^, and no cells have an area of 0 km^2^ which is expected.
+The dataset has `{r} nrow(county_raw)` rows of data, and there are no NA values in `whp`, indicating that each row has a valid value. The range of raster cell area is very small (`{r} county_summary$max_area - county_summary$min_area` km^2^), and no cells have an area of 0 km^2^, as expected.
 
 ## Compute WHP Quantile Edges
 
-Calculate the quantiles of the `whp` column. Use probabilities 0, 0.25, 0.50, 0.75, 0.90, 0.95, 0.99, 1.00.
+The quantiles of the `whp` column are calculated using the probabilities: 0, 0.25, 0.50, 0.75, 0.90, 0.95, 0.99, 1.00.
 
 ```{r}
 e <- quantile(county_raw$whp,
@@ -67,7 +86,7 @@ e
 
 ## Assign a Categorical WHP Risk Label
 
-Assign a risk label based on the WHP percentile. The risk label should be an ordered factor following the levels Very Low, Low, Moderate, High, Very High, Extreme, and Ultra (Top 1%).
+A risk label is assigned to each raster cell based on the WHP percentile. The risk label is an ordered factor following the levels Very Low, Low, Moderate, High, Very High, Extreme, and Ultra (Top 1%).
 
 ```{r}
 county_cats <- county_raw %>%
@@ -88,26 +107,35 @@ county_cats %>%
   arrange(cat_count)
 ```
 
-The distribution of whp values is skewed toward the low side of categories.
+The distribution of `whp` values is skewed toward the lower categories.
 
 ## Calculate Random Ignition Probability
 
-Calculate the total raster cell area in each category, then determine the probability of random ignition based on the proportion of area in each category.
+The probability of random ignition is determined based on the proportion of area in each category.
 
 ```{r}
+#| label: tbl-probability
+#| tbl-cap: "Random Ignition Probability by Risk Category"
+
 prob_tbl <- county_cats %>%
   group_by(category) %>%
   summarize(area_km2 = sum(cell_area_km2),
             n_cells = n(),
             .groups = "drop") %>%
   mutate(probability = area_km2 / sum(area_km2)) %>%
-  select(category, probability, area_km2, n_cells)
+  select(category, probability, area_km2, n_cells) %>%
+  arrange(probability)
 
-# check
-sum(prob_tbl$probability)
-prob_tbl %>% arrange(probability)
+knitr:: kable(prob_tbl, digits = 3)
 ```
 
-`prob_tbl` shows the probability that a random ignition would occur within each risk category. This is assuming that the ignition is equally likely anywhere in the state.
+```{r}
+#check
+sum(prob_tbl$probability)
+```
 
-For example, the nearly 4% probability for the `Extreme` risk category means about 4% of Idaho's land area falls into that category. In other words, a random ignition would have a 4% chance of landing in a raster cell whose WHP value is in the extreme (95-99th percentile) range.
+@tbl-probability shows the probability that a random ignition would occur within each risk category. This assumes that a random ignition is equally likely anywhere in the state.
+
+For example, the 4% probability for the `Extreme` risk category means about 4% of Idaho's land area falls into that category. In other words, a randomly occuring ignition has a 4% chance of landing in a raster cell with a WHP value in the Extreme (95-99th percentile) range.
+
+# Part B
