@@ -33,9 +33,9 @@ oxford_comma <- function(x) {
 
 # Part A
 
-## Introduction
+## Dataset Description {#sec-dataset-description}
 
-This analysis uses the U.S. Forest Service's Wildfire Hazard Potential (WHP) dataset. WHP is a unitless, continuous index, where higher values indicate greater relative hazard. Each record represents a raster cell, including the county it belongs to, the county identifier, and the WHP value for that cell. Since multiple raster cells can fall within a county, each county appears in multiple rows.
+This analysis uses the U.S. Forest Service's Wildfire Hazard Potential (WHP) dataset. WHP is a unitless, continuous index where higher values indicate greater relative wildfire hazard. Each record represents a raster cell and includes the county name, county identifier, and the WHP value for that cell. Since multiple raster cells can fall within a county, each county appears in multiple rows.
 
 ```{r}
 #| results: 'hide'
@@ -70,7 +70,7 @@ county_summary
 
 The dataset has `{r} nrow(county_raw)` rows of data, and there are no NA values in `whp`, indicating that each row has a valid value. The range of raster cell area is very small (`{r} county_summary$max_area - county_summary$min_area` km^2^), and no cells have an area of 0 km^2^, as expected.
 
-## Compute WHP Quantile Edges
+## Quantiles {#sec-quantiles}
 
 The quantiles of the `whp` column are calculated using the probabilities: 0, 0.25, 0.50, 0.75, 0.90, 0.95, 0.99, 1.00.
 
@@ -82,9 +82,9 @@ e <- quantile(county_raw$whp,
 e
 ```
 
-`e` is a vector containing the percentiles of the `whp` field.
+`e` is a numeric vector containing the selected quantiles of the `whp` variable.
 
-## Assign a Categorical WHP Risk Label
+## Risk Categories {#sec-risk-categories}
 
 A risk label is assigned to each raster cell based on the WHP percentile. The risk label is an ordered factor following the levels Very Low, Low, Moderate, High, Very High, Extreme, and Ultra (Top 1%).
 
@@ -107,9 +107,9 @@ county_cats %>%
   arrange(cat_count)
 ```
 
-The distribution of `whp` values is skewed toward the lower categories.
+The distribution of `whp` values is skewed toward the lower categories (right-skewed).
 
-## Calculate Random Ignition Probability
+## Random Ignition Probability {#sec-random-ignition-probability}
 
 The probability of random ignition is determined based on the proportion of area in each category.
 
@@ -134,8 +134,99 @@ knitr:: kable(prob_tbl, digits = 3)
 sum(prob_tbl$probability)
 ```
 
-@tbl-probability shows the probability that a random ignition would occur within each risk category. This assumes that a random ignition is equally likely anywhere in the state.
+@tbl-probability shows the probability that a random ignition would occur within each risk category. This assumes that a random ignition is equally likely to occur anywhere in the state.
 
-For example, the 4% probability for the `Extreme` risk category means about 4% of Idaho's land area falls into that category. In other words, a randomly occuring ignition has a 4% chance of landing in a raster cell with a WHP value in the Extreme (95-99th percentile) range.
+For example, the 4% probability for the `Extreme` risk category means about 4% of Idaho's land area falls into that category. In other words, a randomly occurring ignition has a 4% chance of landing in a raster cell with a WHP value in the Extreme (95-99th percentile) risk category.
 
 # Part B
+
+## Probability of Spread {#sec-probability-of-spread}
+
+Find the probability that the 8-hour straight-line spread is at least 10 km if the ignition starts in a `High` hazard area.
+
+```{r}
+p_high_exact <- plnorm(10, meanlog = 1.907, sdlog = 0.280, lower.tail = FALSE)
+
+p_high_exact
+p_high_exact <- p_high_exact * 100
+p_high_exact
+```
+
+Using a lognormal model, there is a `{r} round(p_high_exact, 2)`% probability that an ignition in a `High` hazard area will spread at least 10 km over an 8-hour period.
+
+## 95th Percentile Run Length {#sec-95th-percentile-run-length}
+
+For ignitions in `High` hazard areas, find the 95th percentile run length for an 8-hour straight line spread.
+
+```{r}
+q95_high <- qlnorm(.95, meanlog = 1.907, sdlog = 0.280)
+
+q95_high
+```
+
+Approximately 95% of ignitions in a `High` hazard area will spread no more than `{r} round(q95_high, 2)` km over 8 hours.
+
+## Density {#sec-density}
+
+Using a probablity density function, compare the relative likelihood of a spread distance of 3 km and 10 km.
+
+```{r}
+d_3 <- dlnorm(3, meanlog = 1.907, sdlog = 0.280)
+
+d_10 <- dlnorm(10, meanlog = 1.907, sdlog = 0.280)
+
+d_3
+d_10
+```
+
+The density value for 3 km is `{r} round(d_3, 3)` and the density value for 10 km is `{r} round(d_10, 3)`. The higher density at 10 km suggests that distances near 10km will occur more frequently than those near 3 km.
+
+## Simulate High-Hazard Distances {#sec-simulate-high-hazard-distances}
+
+Using 450 simulations, find the range and typical values of 8-hour straight-line distances for ignitions in `High` hazard areas.
+
+```{r}
+set.seed(2025)
+
+high_lognorm <- rlnorm(450, meanlog = 1.907, sdlog = 0.280)
+
+# check
+summary(high_lognorm)
+length(high_lognorm)
+
+range(high_lognorm)
+```
+
+Based on 450 simulated distances, median is `{r} round(median(high_lognorm), 2)` and the mean is `{r} round(mean(high_lognorm), 2)`, indicating that the data is right-skewed. The range of distances spans from `{r} round(min(high_lognorm), 2)` km to `{r} round(max(high_lognorm), 2)` km.
+
+## Fast-Growing Ignitions {#sec-fast-growing-ignitions}
+
+For this part of the analysis, a fast-growing ignition is one where the 8-hour straight-line distance is ≥ 10 km. Determine how many of the 450 simulated distances would be fast-growing.
+
+```{r}
+fast_growing_count <- (high_lognorm >= 10) %>%
+  sum()
+
+fast_growing_count
+```
+
+Out of 450 simulations, `{r} fast_growing_count` are ignitions that are fast-growing. The simulated proportion of fast-growing ignitions is `{r} round(fast_growing_count * 100 / length(high_lognorm), 2)`%, which is slightly lower than the probability calculated using the lognormal model (`{r} round(p_high_exact, 2)`%).
+
+## Visualize Simulated Distances {#sec-visualize-simulated-distances}
+
+A histogram is used to visualize the simulated distances.
+
+```{r}
+#| label: fig-sim-dist
+#| fig-cap: "Simulated 8-hour straight-line distances for High hazard areas."
+#| fig-alt: "A histogram showing the straight-line distances for High hazard areas with distance on the x-axis and frequency on the y-axis."
+
+hist(high_lognorm,
+     main = "Distribution of Simulated Distances (n = 450)",
+     xlab = "Distance (km)",
+     col = "steelblue")
+```
+
+@fig-sim-dist shows the distribution of simulated distances. The shape is right-skewed, which agrees with what was found in @sec-simulate-high-hazard-distances.
+
+# Part C
