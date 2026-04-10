@@ -440,3 +440,5 @@ legend("topright",
 ```
 
 @fig-fast-counts shows the distribution of seasonal fast-growing ignitions. The number of seasons that visually appear above the threshold of at least 50 fast-growing ignitions appears to match the calculated probability of `{r} round(prob_50 * 100, 1)`%.
+
+This is a higher percentage than I was expecting. Assuming a person's lifetime is 80 years and they live all of their years in Idaho, approximately `{r} round(prob_50 * 80, 0)` years of their life will have fire seasons where there are at least 50 fast-growing ignitions. Yikes!
