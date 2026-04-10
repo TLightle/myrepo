@@ -230,3 +230,213 @@ hist(high_lognorm,
 @fig-sim-dist shows the distribution of simulated distances. The shape is right-skewed, which agrees with what was found in @sec-simulate-high-hazard-distances.
 
 # Part C
+
+## Create vectors
+
+**Category Labels**
+
+Create a vector of category labels.
+
+```{r}
+labels <- c("Very Low", "Low", "Moderate", "High", "Very High", "Extreme", "Ultra (Top 1%)")
+
+labels
+```
+
+The character vector, `labels`, will be used to assign the order of risk categories, and must be spelled correctly to align with the risk categories assigned to the dataset in Part A.
+
+**Probabilities**
+
+Create a vector of probabilities.
+
+```{r}
+prob <- c(.25, .25, .25, .15, .05, .04, .01)
+
+sum(prob)
+```
+
+The sum of the probabilities in `prob` equals 1, as expected.
+
+**Mean logs**
+
+Create a vector of the Mean log values.
+
+```{r}
+meanlog <- c(0.582, 1.046, 1.451, 1.907, 2.455, 2.866, 3.310)
+
+meanlog
+```
+
+**SD logs**
+
+Create a vector of the SD log values.
+
+```{r}
+sdlog <- c(0.472, 0.325, 0.325, 0.280, 0.246, 0.220, 0.212)
+
+sdlog
+```
+
+**Check**
+
+Ensure that the lengths of all vectors is equal so that each category has a value for probability, mean log, and sd log.
+
+```{r}
+length(labels) == length(prob) &&
+length(labels) == length(meanlog) &&
+length(labels) == length(sdlog)
+```
+
+## Simulate One Season
+
+### Categories
+
+Simulate one season of 450 ignitions to find the categories according to their probabilities. Display results in a table.
+
+```{r}
+set.seed(2025)
+
+idx <- sample.int(length(labels),
+              size = 450,
+              replace = TRUE,
+              prob = prob)
+
+idx_tbl <- table(factor(labels[idx], levels = labels))
+
+idx_tbl
+```
+
+Check the simulated category counts compared to the theoretical proportions in `prob`.
+
+```{r}
+(table(labels[idx]) / 450)[labels]
+
+prob
+
+```
+
+That result is a bit hard to read, I want to visualize in a table instead.
+
+```{r}
+#| label: tbl-summary
+#| tbl-cap: "Simulated vs Expected Probability"
+
+summary_tbl <- data.frame(
+  Category = labels,
+  Frequency = as.numeric(idx_tbl),
+  Sim_Prob = as.numeric(idx_tbl) / 450,
+  Exp_Prob = prob
+)
+
+knitr:: kable(summary_tbl, digits = 2)
+```
+
+I used AI (chatGPT) to help organize this into a table so it is easier to compare.
+
+@tbl-summary shows the risk category, frequency, simulated probability, and expected probability in the one-season simulation. The simulated probabilities closely approximate the expected probabilities, with small deviations at the high-risk (lower frequency) categories due to random sampling variability.
+
+### Distances
+
+Simulate 8-hour distances for the same season.
+
+```{r}
+d <- rlnorm(length(idx), meanlog = meanlog[idx], sdlog = sdlog[idx])
+
+head(d)
+summary(d)
+```
+
+The median distance for this simulation is `{r} round(median(d), 2)` and the mean is `{r} round(mean(d), 2)` indicating the data is right-skewed.
+
+### Fast-Growing ignitions
+
+A fast-growing ignition is one where distance ≥ 10 km, so create logical vector from `d` indicating if each value is above the fast-growing threshold.
+
+```{r}
+fast_flags_one <- d >= 10
+```
+
+Count the number of fast-growing ignitions in this simulation.
+
+```{r}
+fast_count_one <- sum(fast_flags_one)
+```
+
+In this simulation, there are `{r} fast_count_one` ignitions that are considered fast-growing, which represents `{r} round(mean(fast_flags_one) * 100, 1)` % of total ignitions.
+
+### Combine Logic
+
+Combine the steps into one code block so it can be used to replicate many seasons.
+
+```{r}
+set.seed(2025)
+
+fast_count_one <- {
+  idx <- sample.int(length(labels),
+              size = 450,
+              replace = TRUE,
+              prob = prob)
+  
+  sum(rlnorm(length(idx), meanlog = meanlog[idx], sdlog = sdlog[idx]) >= 10)
+}
+
+fast_count_one
+```
+
+I was initially getting different results for `fast_count_one`, and used help from AI (chatGPT). I learned that I need to set the same seed for both versions so that both versions use the same random inputs. Now, I can see that the logic in this combined code block matches the logic created iteratively.
+
+## Simulate Many Seasons
+
+Simulate 1000 seasons, where each season has 450 ignitions.
+
+```{r}
+set.seed(2025)
+
+counts_fast_mix <- replicate(1000,
+          {idx <- sample.int(length(labels),
+              size = 450,
+              replace = TRUE,
+              prob = prob)
+          sum(rlnorm(length(idx), meanlog = meanlog[idx], sdlog = sdlog[idx]) >= 10)
+          }
+          )
+
+summary(counts_fast_mix)
+```
+
+Find the number of seasons that have at least 50 fast-growing ignitions and the probability that any one season has at least 50 fast-growing ignitions.
+
+```{r}
+sum(counts_fast_mix >= 50)
+
+prob_50 <- sum(counts_fast_mix >= 50) / length(counts_fast_mix)
+```
+
+In this simulation of 1000 seasons, there are `{r} sum(counts_fast_mix >= 50)` seasons that have at least 50 fast-growing ignitions. Therefore the probability that any one season has at least 50 fast-growing events is `{r} prob_50 * 100`%.
+
+### Distribution of Fast-Growing Counts
+
+The distribution of fast-growing counts can be visualized using a histogram, where the x-axis represents the total number of fast-growing counts in a season.
+
+```{r}
+#| label: fig-fast-counts
+#| fig-cap: ""
+#| fig-alt: "A histogram showing the number of fast-growing events per season, with the number of fast-growing events on the x-axis and frequency on the y-axis."
+
+hist(counts_fast_mix,
+     main = "Distribution of Seasonal Fast-Growing Ignitions",
+     xlab = "Number of Fast-Growing Ignitions",
+     col = "steelblue")
+
+abline(v = 50, col = "coral2", lwd = 2, lty = 1)
+
+legend("topright",
+       legend = "Fast-Fire Threshold",
+       col = "coral2",
+       lty = 1,
+       lwd = 2,
+       bg = "white",
+       bty = "o")
+```
+
+@fig-fast-counts shows the distribution of seasonal fast-growing ignitions. The number of seasons that visually appear above the threshold of at least 50 fast-growing ignitions appears to match the calculated probability of `{r} round(prob_50 * 100, 1)`%.
