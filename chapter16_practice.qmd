@@ -44,7 +44,7 @@ The species virginica and versicolor have a stronger linear correlation between 
 
 ```{r}
 Petal_Spread <- iris %>%
-  ggplot(aes(x = Species, y = Petal.Width, color = Species)) +
+  ggplot(aes(x = Species, y = Petal.Width, fill = Species)) +
   geom_boxplot(show.legend = FALSE)
 
 Petal_Spread
