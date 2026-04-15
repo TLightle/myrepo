@@ -1,0 +1,132 @@
+---
+title: "Chapter 16 Notes"
+subtitle: "ggplot2"
+author: "Tammy Lightle"
+date: today
+toc: true
+toc-depth: 2
+number-sections: true
+format: 
+  html:
+    code-fold: true
+editor: visual
+---
+
+## Loading Packages
+
+```{r}
+#| warning: false
+library(dslabs)
+library(dplyr)
+library(ggplot2)
+```
+
+## The Blank Canvas
+
+```{r}
+data("divorce_margarine")
+
+divorce_margarine %>%
+  ggplot()
+```
+
+## Mapping Aesthetics
+
+```{r}
+divorce_margarine %>%
+  ggplot(aes(x = divorce_rate_maine, y = margarine_consumption_per_capita))
+```
+
+## Scatterplots
+
+```{r}
+divorce_margarine %>%
+  ggplot(aes(divorce_rate_maine, margarine_consumption_per_capita)) +
+  geom_point()
+```
+
+```{r}
+divorce_margarine %>%
+  ggplot(aes(divorce_rate_maine, margarine_consumption_per_capita)) +
+  geom_point(aes(color = year))
+```
+
+```{r}
+divorce_margarine %>%
+  ggplot(aes(divorce_rate_maine, margarine_consumption_per_capita)) +
+  geom_point(aes(color = year)) +
+  geom_smooth(method = "lm", se = TRUE)
+```
+
+## Histograms
+
+```{r}
+set.seed(2025)
+Tallness <- data.frame(
+  Country = c(rep("USA", 1000), rep("CAN", 1000)),
+  Height = c(rnorm(1000, 67, 2.5), rnorm(1000, 66, 1.5))
+)
+
+nrow(Tallness)
+Tallness %>%
+  group_by(Country) %>%
+  summarize(n = n(),
+            mean_height = mean(Height),
+            sd_height = sd(Height),
+            .groups = "drop")
+```
+
+```{r}
+Tallness %>%
+  ggplot(aes(Height)) +
+  geom_histogram()
+```
+
+```{r}
+Tallness %>%
+  ggplot(aes(Height)) +
+  geom_histogram(fill = "steelblue",
+                 color = "white",
+                 binwidth = 0.5)
+```
+
+```{r}
+Tallness %>%
+  ggplot(aes(Height)) +
+  geom_density(fill = "purple",
+               alpha = .1, 
+               color = "purple",
+               linewidth = 1)
+```
+
+```{r}
+tall_compared_fig <- Tallness %>%
+  ggplot(aes(Height, fill = Country)) +
+  geom_histogram(position = "identity",
+                 alpha = 0.6)
+
+print(tall_compared_fig)
+```
+
+## Boxplots
+
+```{r}
+Tall_Box <- Tallness %>%
+  ggplot(aes(Country, Height, fill = Country)) +
+  geom_boxplot(show.legend = FALSE)
+
+Tall_Box
+```
+
+## Labels and Themes
+
+```{r}
+Tall_Box <- Tallness %>%
+  ggplot(aes(Country, Height, fill = Country)) +
+  geom_boxplot(show.legend = FALSE) +
+  xlab("North American Country") +
+  ylab("Height (inches)") +
+  ggplot2::theme_minimal()
+
+Tall_Box
+```

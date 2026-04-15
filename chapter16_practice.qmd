@@ -1,0 +1,78 @@
+---
+title: "Chapter 16 Practice"
+author: "Tammy Lightle"
+date: today
+toc: true
+toc-depth: 2
+number-sections: true
+format: 
+  html:
+    code-fold: true
+    self-contained: true
+editor: visual
+---
+
+```{r setup}
+#| warning: false
+
+library(dslabs)
+library(dplyr)
+library(ggplot2)
+```
+
+## Task 1: Quick Recall
+
+`ggplot2` has three core steps. First supply a dataframe, then map the aesthetics, and finally add geometric objects.
+
+## Task 2: Scatterplot
+
+Using the `iris` dataset, create a scatterplot showing the relationship between sepal length and petal length.
+
+```{r}
+Pretty_Flowers <- iris %>%
+  ggplot(aes(Sepal.Length, Petal.Length, color = Species)) +
+  geom_point(size = 3) +
+  xlab("Sepal Length (cm)") +
+  ylab("Petal Length (cm)")
+
+Pretty_Flowers
+```
+
+The species virginica and versicolor have a stronger linear correlation between sepal length and petal length than setosa.
+
+## Task 3: Boxplot - group comparison
+
+```{r}
+Petal_Spread <- iris %>%
+  ggplot(aes(x = Species, y = Petal.Width, color = Species)) +
+  geom_boxplot(show.legend = FALSE)
+
+Petal_Spread
+```
+
+The species virginica has the largest petal width distribution.
+
+## Task 4: Histogram vs Density Plot
+
+```{r}
+Tall_Density <- heights %>%
+  ggplot(aes(x = height)) +
+  geom_histogram(aes(y = after_stat(density)),
+                     binwidth = 1,
+                     fill = "blue",
+                     color = "white") +
+  geom_density(color = "darkorange",
+               fill = "darkorange",
+               alpha = 0.3,
+               linewidth = 1) +
+  xlab("Height (inches)") +
+  ylab("Density")
+
+Tall_Density
+```
+
+Combining the density curve with the histogram makes the shape easier to describe because it is easier to visualize the distribution.
+
+## Task 5: Reflect
+
+A density curve is more useful than a histogram when you want to describe the overall shape of the distribution. It will also be useful when comparing distributions between variables.
